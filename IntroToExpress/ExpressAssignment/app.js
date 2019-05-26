@@ -8,18 +8,18 @@ app.get("/", function(req, res) {
 });
 
 app.get("/speak/:animal", function(req, res) {
-  let animal = req.params.animal;
-  let sound;
+  let sounds = {
+    pig: "Oink",
+    cow: "Moo",
+    dog: "Woof Woof!",
+    cat: "I hate you human",
+    goldfish: "..."
+  };
 
-  if (animal == "pig") {
-    sound = "Oink";
-  } else if (animal == "cow") {
-    sound = "Moo";
-  } else if (animal == "dog") {
-    sound = "Woof Woof";
-  }
+  let animal = req.params.animal.toLowerCase();
+  let sound = sounds[animal];
 
-  res.send("The " + animal + " says '" + sound + "!'");
+  res.send("The " + animal + " says '" + sound + "'");
 });
 
 app.get("/repeat/:word/:numTimes", function(req, res) {
