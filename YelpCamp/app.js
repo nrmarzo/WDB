@@ -62,7 +62,8 @@ app.post("/campgrounds", function(req, res) {
   // get data from form and add to campgrounds array
   let name = req.body.name;
   let image = req.body.image;
-  let newCampground = { name: name, image: image };
+  let desc = req.body.description;
+  let newCampground = { name: name, image: image, description: desc };
 
   // Create new campground and save to DB
   Campground.create(newCampground, function(err, newlyCreated) {
@@ -78,9 +79,16 @@ app.post("/campgrounds", function(req, res) {
 // SHOW - shows more info about one campground
 app.get("/campgrounds/:id", function(req, res) {
   // Find the campground with provided ID
-  // Campground.findById(req.params.id, function(err, foun))
-  // render show template with that ID
-  res.render("show");
+  Campground.findById(req.params.id, function(err, foundCampground) {
+    if (err) {
+      console.log(err);
+    } else {
+      // render show template with that ID
+      res.render("show", { campground: foundCampground });
+    }
+  });
+
+  // res.render("show");
 });
 
 app.listen(PORT, function() {
