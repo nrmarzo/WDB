@@ -1,20 +1,38 @@
+var todos = [];
+
 window.setTimeout(function() {
-  var todos = [];
   var cmd = prompt("What would you like to do?");
 
   while (cmd !== "quit") {
     if (cmd === "new") {
-      var newTodo = prompt("Enter a new todo");
-      todos.push(newTodo);
+      addTodo();
     } else if (cmd === "list") {
-      todos.forEach(function(todo) {
-        console.log(todo);
-      });
-      // for (var i = 0; i < todos.length; i++) {
-      //   console.log(todos[i]);
-      // }
+      listTodos();
+    } else if (cmd === "delete") {
+      deleteTodo();
     }
 
     cmd = prompt("What would you like to do?");
   }
 }, 500);
+
+function addTodo() {
+  var newTodo = prompt("Enter a new todo");
+  todos.push(newTodo);
+  console.log("Todo added");
+}
+
+function listTodos() {
+  console.log("===================");
+  todos.forEach(function(todo, i) {
+    console.log(i + ": " + todo);
+  });
+
+  console.log("===================");
+}
+
+function deleteTodo() {
+  var index = prompt("Enter the index of the todo you want to delete");
+  todos.splice(index, 1);
+  console.log("Todo " + index + " deleted");
+}
