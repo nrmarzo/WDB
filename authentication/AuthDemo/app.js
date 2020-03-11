@@ -14,6 +14,7 @@ mongoose.connect("mongodb://localhost/auth_demo_app", {
   useUnifiedTopology: true
 });
 
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   require("express-session")({
     secret: "Alexis is the cutest among the cutest",
@@ -41,6 +42,7 @@ app.get("/secret", function(req, res) {
 
 // Auth Routes
 
+// SIGN UP ROUTES
 // show sign up form
 app.get("/register", function(req, res) {
   res.render("register");
@@ -48,8 +50,32 @@ app.get("/register", function(req, res) {
 
 // handle user sign up
 app.post("/register", function(req, res) {
-  res.send("REGISTER POST ROUTE");
+  User.register(new User({ username: req.body.username }), req.body.password, function(err, user) {
+    if (err) {
+      console.log(err);
+      return res.render("register");
+    }
+    passport.authenticate("local")(req, res, function() {
+      res.redirect("/secret");
+    });
+  });
 });
+
+// LOGIN ROUTES
+// render login form
+app.get("/login", function(req, res) {
+  res.render("login");
+});
+
+// login logic
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/secret",
+    failureRedirect: "/login"
+  }),
+  function(req, res) {}
+);
 
 app.listen(3000, function() {
   console.log("Server has started...");
