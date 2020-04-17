@@ -37,6 +37,13 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// create middle ware to pass currentUser on all routes
+// without doing it manually
+app.use(function (req, res, next) {
+  res.locals.currentUser = req.user;
+  next();
+});
+
 // ===========================
 // ROUTES
 // ===========================
@@ -51,6 +58,7 @@ app.get("/", function (req, res) {
 
 // INDEX - show all campgrounds
 app.get("/campgrounds", function (req, res) {
+  console.log(req.user);
   // Get all campgrounds from DB
   Campground.find({}, function (err, allCampgrounds) {
     if (err) {
@@ -94,7 +102,6 @@ app.get("/campgrounds/:id", function (req, res) {
       if (err) {
         console.log(err);
       } else {
-        console.log(foundCampground);
         // render show template with that campground
         res.render("campgrounds/show", { campground: foundCampground });
       }
@@ -106,7 +113,7 @@ app.get("/campgrounds/:id", function (req, res) {
 // ===========================
 
 // NEW route
-app.get("/campgrounds/:id/comments/new", function (req, res) {
+app.get("/campgrounds/:id/comments/new", isLoggedIn, function (req, res) {
   // find campground by ID
   Campground.findById(req.params.id, function (err, campground) {
     if (err) {
@@ -118,7 +125,7 @@ app.get("/campgrounds/:id/comments/new", function (req, res) {
 });
 
 // CREATE route
-app.post("/campgrounds/:id/comments", function (req, res) {
+app.post("/campgrounds/:id/comments", isLoggedIn, function (req, res) {
   // lookup campground using id
   Campground.findById(req.params.id, function (err, campground) {
     if (err) {
@@ -169,6 +176,7 @@ app.get("/login", function (req, res) {
   res.render("login");
 });
 
+// login logic
 app.post(
   "/login",
   passport.authenticate("local", {
@@ -177,6 +185,22 @@ app.post(
   }),
   function (req, res) {}
 );
+
+// logout logic
+app.get("/logout", function (req, res) {
+  req.logout();
+  res.redirect("/");
+});
+
+// ===========================
+// MIDDLE WARE
+// ===========================
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/login");
+}
 
 // ===========================
 // ===========================
