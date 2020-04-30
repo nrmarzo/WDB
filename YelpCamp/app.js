@@ -4,6 +4,7 @@ var express = require("express"),
   mongoose = require("mongoose"),
   passport = require("passport"),
   LocalStrategy = require("passport-local"),
+  methodOverride = require("method-override"),
   Comment = require("./models/comment"),
   Campground = require("./models/campground"),
   User = require("./models/user"),
@@ -16,11 +17,13 @@ var commentRoutes = require("./routes/comments"),
 mongoose.connect("mongodb://localhost/yelp_camp", {
   useUnifiedTopology: true,
   useNewUrlParser: true,
+  useFindAndModify: false,
 });
 mongoose.set("useUnifiedTopology", false);
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
 
 //seedDB();   // seed the database
 
