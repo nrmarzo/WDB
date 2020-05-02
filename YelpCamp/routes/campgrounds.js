@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var Campground = require("../models/campground");
+var Comment = require("../models/comment");
 
 // INDEX - show all campgrounds
 router.get("/", function (req, res) {
@@ -85,12 +86,17 @@ router.put("/:id", function (req, res) {
 
 // DESTROY - destroy campground
 router.delete("/:id", function (req, res) {
-  Campground.findByIdAndRemove(req.params.id, function (err) {
+  Campground.findByIdAndRemove(req.params.id, function (err, removedCampground) {
     if (err) {
-      res.redirect("/campgrounds");
-    } else {
-      res.redirect("/campgrounds");
+      console.log(err);
     }
+    // delete all associated comments on the campground!
+    Comment.deleteMany({ _id: { $in: removedCampground.comments } }, function (err) {
+      if (err) {
+        console.log(err);
+      }
+      res.redirect("/campgrounds");
+    });
   });
 });
 
